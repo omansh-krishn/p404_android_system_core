@@ -1434,7 +1434,9 @@ void PropertyInit() {
     }
 
     // Report valid verified boot chain to help pass Google SafetyNet integrity checks
-    SetSafetyNetProps();
+    if (!IsRecoveryMode()) {
+        SetSafetyNetProps();
+    }
 
     // If arguments are passed both on the command line and in DT,
     // properties set in DT always have priority over the command-line ones.
