@@ -32,10 +32,14 @@ on early-init
     # memory.pressure_level used by lmkd
     chown root system /dev/memcg/memory.pressure_level
     chmod 0040 /dev/memcg/memory.pressure_level
+
     # app mem cgroups, used by activity manager, lmkd and zygote
     mkdir /dev/memcg/apps/ 0755 system system
+    write /dev/memcg/apps/memory.swappiness 100
+
     # cgroup for system_server and surfaceflinger
     mkdir /dev/memcg/system 0550 system system
+    write /dev/memcg/system/memory.swappiness 100
 
     # symlink the Android specific /dev/tun to Linux expected /dev/net/tun
     mkdir /dev/net 0755 root root
@@ -338,16 +342,6 @@ on init
     chmod 0664 /dev/cpuset/restricted/tasks
     chmod 0664 /dev/cpuset/tasks
 
-    # freezer cgroup entries
-    mkdir /dev/freezer/frozen
-    write /dev/freezer/frozen/freezer.state FROZEN
-    chown system system /dev/freezer/cgroup.procs
-    chown system system /dev/freezer/frozen
-    chown system system /dev/freezer/frozen/freezer.state
-    chown system system /dev/freezer/frozen/cgroup.procs
-
-    chmod 0664 /dev/freezer/frozen/freezer.state
-
     # make the PSI monitor accessible to others
     chown system system /proc/pressure/memory
     chmod 0664 /proc/pressure/memory
@@ -362,8 +356,6 @@ on init
     # This is needed by any process that uses socket tagging.
     chmod 0644 /dev/xt_qtaguid
 
-    chown root root /dev/cg2_bpf
-    chmod 0600 /dev/cg2_bpf
     mount bpf bpf /sys/fs/bpf nodev noexec nosuid
 
     # Create location for fs_mgr to store abbreviated output from filesystem
